@@ -12,9 +12,9 @@ const emailHref = `mailto:${profile.email}`
 </script>
 
 <template>
-  <section id="home" class="relative flex min-h-screen items-center overflow-hidden pt-16">
+  <section id="home" class="relative flex min-h-screen items-center pt-16">
     <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-accent-500/10 blur-3xl dark:bg-accent-500/20"></div>
-    <div class="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-500/20"></div>
+    <div class="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-amber-500/10 blur-3xl dark:bg-amber-500/20"></div>
 
     <div class="relative mx-auto max-w-6xl px-4 py-20 sm:px-6">
       <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-1.5 text-sm text-slate-600 dark:border-slate-800 dark:text-slate-400">
@@ -24,7 +24,7 @@ const emailHref = `mailto:${profile.email}`
 
       <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl">
         Hi, I'm
-        <span class="bg-gradient-to-r from-accent-500 to-indigo-500 bg-clip-text text-transparent">{{ profile.name }}</span>
+        <span class="bg-gradient-to-r from-accent-500 to-amber-500 bg-clip-text text-transparent">{{ profile.name }}</span>
       </h1>
       <p class="mt-3 text-xl font-semibold text-slate-600 dark:text-slate-300 sm:text-2xl">
         {{ profile.credentials }} · {{ profile.role }}
