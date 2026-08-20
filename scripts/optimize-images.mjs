@@ -1,4 +1,4 @@
-import { glob, stat, rename } from 'node:fs/promises'
+import { readdir, stat, rename } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
@@ -8,10 +8,10 @@ const IMG_DIR = path.join(ROOT, 'src', 'assets', 'img')
 const MAX_DIMENSION = 1920
 const QUALITY = 80
 
-const files = []
-for await (const file of glob(`${IMG_DIR}/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}`)) {
-  files.push(file)
-}
+const IMG_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp'])
+const files = (await readdir(IMG_DIR))
+  .filter((name) => IMG_EXT.has(path.extname(name).toLowerCase()))
+  .map((name) => path.join(IMG_DIR, name))
 
 if (files.length === 0) {
   console.log('No images found in', IMG_DIR)
