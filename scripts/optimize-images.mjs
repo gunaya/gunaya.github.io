@@ -1,50 +1,28 @@
-import { readdir, stat, rename } from 'node:fs/promises'
+import { readdir, mkdir, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 
-const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
-const IMG_DIR = path.join(ROOT, 'src', 'assets', 'img')
-const MAX_DIMENSION = 1920
-const QUALITY = 80
+const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
+const inputDir = path.join(root, 'src/assets/img')
+const outputDir = path.join(root, 'src/generated/photos')
+const extensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif'])
+const files = (await readdir(inputDir)).filter((name) => extensions.has(path.extname(name).toLowerCase())).sort()
+await mkdir(outputDir, { recursive: true })
 
-const IMG_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp'])
-const files = (await readdir(IMG_DIR))
-  .filter((name) => IMG_EXT.has(path.extname(name).toLowerCase()))
-  .map((name) => path.join(IMG_DIR, name))
-
-if (files.length === 0) {
-  console.log('No images found in', IMG_DIR)
-  process.exit(0)
+const imports = []
+const entries = []
+for (const [index, name] of files.entries()) {
+  // Hash the filename to avoid collisions, including files that differ only by extension.
+  const id = createHash('sha256').update(name).digest('hex').slice(0, 16)
+  const input = path.join(inputDir, name)
+  const fullName = `${id}-full.webp`
+  const thumbName = `${id}-thumb.webp`
+  const info = await sharp(input).rotate().resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toFile(path.join(outputDir, fullName))
+  await sharp(input).rotate().resize({ width: 640, height: 640, fit: 'inside', withoutEnlargement: true }).webp({ quality: 75 }).toFile(path.join(outputDir, thumbName))
+  imports.push(`import full${index} from './${fullName}'`, `import thumb${index} from './${thumbName}'`)
+  entries.push(`  { src: full${index}, thumbnail: thumb${index}, filename: ${JSON.stringify(name)}, orient: ${JSON.stringify(info.width > info.height ? 'landscape' : 'portrait')} }`)
 }
-
-let totalSaved = 0
-
-for (const file of files) {
-  const meta = await sharp(file).metadata()
-  const width = meta.width ?? 0
-  const height = meta.height ?? 0
-  const tooLarge = width > MAX_DIMENSION || height > MAX_DIMENSION
-
-  if (!tooLarge) continue
-
-  const before = (await stat(file)).size
-  const tmp = `${file}.tmp`
-
-  await sharp(file)
-    .rotate()
-    .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: QUALITY, mozjpeg: true })
-    .toFile(tmp)
-
-  const after = (await stat(tmp)).size
-  await rename(tmp, file)
-
-  const saved = before - after
-  totalSaved += saved
-  console.log(
-    `${path.basename(file)}: ${width}x${height} -> ${(before / 1024 / 1024).toFixed(2)}MB -> ${(after / 1024 / 1024).toFixed(2)}MB`
-  )
-}
-
-console.log(`Total saved: ${(totalSaved / 1024 / 1024).toFixed(2)}MB`)
+await writeFile(path.join(outputDir, 'index.js'), `${imports.join('\n')}\n\nexport default [\n${entries.join(',\n')}\n]\n`)
+console.log(`Generated ${files.length} optimized photos and thumbnails without changing originals.`)

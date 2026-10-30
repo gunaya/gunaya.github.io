@@ -66,7 +66,7 @@
 				</button>
 			</div>
 
-			<button type="button" aria-label="Toggle menu" class="rounded-lg p-2 text-slate-600 dark:text-slate-400 md:hidden" @click="menuOpen = !menuOpen">
+			<button type="button" aria-label="Toggle menu" :aria-expanded="menuOpen" aria-controls="mobile-menu" class="rounded-lg p-2 text-slate-600 dark:text-slate-400 md:hidden" @click="menuOpen = !menuOpen">
 				<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
 					<path v-if="!menuOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
 					<path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -74,7 +74,7 @@
 			</button>
 		</nav>
 
-		<div v-if="menuOpen" class="border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950 md:hidden">
+		<div v-if="menuOpen" id="mobile-menu" class="border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950 md:hidden">
 			<a
 				v-for="s in sections"
 				:key="s.id"
@@ -83,6 +83,9 @@
 				@click="menuOpen = false">
 				{{ s.label }}
 			</a>
+			<button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800" @click="$emit('toggle-theme')">
+				Switch to {{ isDark ? 'light' : 'dark' }} theme
+			</button>
 		</div>
 	</header>
 </template>

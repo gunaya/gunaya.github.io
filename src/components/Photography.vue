@@ -1,125 +1,64 @@
 <script setup>
-	import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-
-	const modules = import.meta.glob('../assets/img/*.{jpg,jpeg,png,JPG,JPEG,PNG,webp,avif}', {
-		eager: true,
-		import: 'default'
-	});
-
-	const photos = Object.entries(modules).map(([path, src]) => {
-		const name = path
-			.split('/')
-			.pop()
-			.replace(/\.[^.]+$/, '');
-		return { src, name: name.replace(/[-_]+/g, ' ') };
-	});
-
-	function shuffle(arr) {
-		const a = [...arr];
-		for (let i = a.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[a[i], a[j]] = [a[j], a[i]];
-		}
-		return a;
-	}
+	import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
+	import photos from '../generated/photos/index.js';
+	import { createSlots, shuffle } from '../utils/gallery.js';
+	import { photoDescriptions } from '../data/photo-descriptions.js';
 
 	const ordered = shuffle(photos);
+	const displayed = ref(createSlots(photos));
+	const selected = ref(null);
+	const selectedOpen = ref(false);
+	const dialog = ref(null);
+	const closeButton = ref(null);
+	let previousFocus = null;
+	let swapTimer = null;
 
-	const PORTRAIT = 'portrait';
-	const LANDSCAPE = 'landscape';
-	const SLOT_COUNT = 8;
-	const slotOrient = [PORTRAIT, LANDSCAPE, LANDSCAPE, LANDSCAPE, PORTRAIT, LANDSCAPE, PORTRAIT, PORTRAIT];
-
-	const displayed = ref([]);
-	const poolPortrait = ref([]);
-	const poolLandscape = ref([]);
-
-	function loadOrientations() {
-		return Promise.all(
-			photos.map(
-				(p) =>
-					new Promise((resolve) => {
-						const img = new Image();
-						img.onload = () => {
-							p.orient = img.naturalWidth > img.naturalHeight ? LANDSCAPE : PORTRAIT;
-							resolve();
-						};
-						img.onerror = () => {
-							p.orient = LANDSCAPE;
-							resolve();
-						};
-						img.src = p.src;
-					})
-			)
-		);
-	}
-
-	function initSlots() {
-		const arr = Array(SLOT_COUNT).fill(null);
-		const portraits = shuffle(photos.filter((p) => p.orient === PORTRAIT));
-		const landscapes = shuffle(photos.filter((p) => p.orient === LANDSCAPE));
-		for (let i = 0; i < SLOT_COUNT; i++) arr[i] = slotOrient[i] === PORTRAIT ? portraits.pop() : landscapes.pop();
-		const rest = [...portraits, ...landscapes];
-		for (let i = 0; i < SLOT_COUNT; i++) {
-			if (!arr[i]) arr[i] = rest.shift();
-		}
-		const used = new Set(arr.map((p) => p.src));
-		poolPortrait.value = portraits.filter((p) => !used.has(p.src));
-		poolLandscape.value = landscapes.filter((p) => !used.has(p.src));
-		displayed.value = arr;
+	function description(photo) {
+		return photoDescriptions[photo.filename] || 'Photograph from I Wayan Gunaya’s portfolio';
 	}
 
 	function swapRandom() {
-		const arr = displayed.value;
-		const union = [...poolPortrait.value, ...poolLandscape.value];
-		if (!union.length) return;
-		const slot = Math.floor(Math.random() * arr.length);
-		const targetOrient = arr[slot].orient;
-		let cand = targetOrient === PORTRAIT ? [...poolPortrait.value] : [...poolLandscape.value];
-		if (!cand.length) cand = union;
-		if (!cand.length) return;
-		const next = cand[Math.floor(Math.random() * cand.length)];
-		const old = arr[slot];
-		if (next.orient === PORTRAIT) poolPortrait.value = poolPortrait.value.filter((p) => p.src !== next.src);
-		else poolLandscape.value = poolLandscape.value.filter((p) => p.src !== next.src);
-		if (old.orient === PORTRAIT) poolPortrait.value.push(old);
-		else poolLandscape.value.push(old);
-		displayed.value = arr.map((p, i) => (i === slot ? next : p));
+		const used = new Set(displayed.value.map((photo) => photo.src));
+		const remaining = photos.filter((photo) => !used.has(photo.src));
+		if (!remaining.length || !displayed.value.length) return;
+		const slot = Math.floor(Math.random() * displayed.value.length);
+		const matching = remaining.filter((photo) => photo.orient === displayed.value[slot].orient);
+		const candidates = matching.length ? matching : remaining;
+		const next = candidates[Math.floor(Math.random() * candidates.length)];
+		displayed.value = displayed.value.map((photo, i) => i === slot ? next : photo);
 	}
 
-	let swapTimer = null;
-
-	const selected = ref(null);
-	const selectedOpen = ref(false);
-
-	function show(photo) {
+	async function show(photo) {
+		previousFocus = document.activeElement;
 		selected.value = photo;
 		selectedOpen.value = true;
+		await nextTick();
+		closeButton.value?.focus();
 	}
 	function close() {
 		selectedOpen.value = false;
+		previousFocus?.focus();
 	}
-
-	const index = computed(() => (selected.value ? ordered.indexOf(selected.value) : 0));
-	function prev() {
-		const i = ordered.indexOf(selected.value);
-		selected.value = ordered[(i - 1 + ordered.length) % ordered.length];
-	}
-	function next() {
-		const i = ordered.indexOf(selected.value);
-		selected.value = ordered[(i + 1) % ordered.length];
-	}
-
+	const index = computed(() => selected.value ? ordered.indexOf(selected.value) : 0);
+	function prev() { selected.value = ordered[(index.value - 1 + ordered.length) % ordered.length]; }
+	function next() { selected.value = ordered[(index.value + 1) % ordered.length]; }
 	function onKey(e) {
 		if (!selectedOpen.value) return;
 		if (e.key === 'Escape') close();
-		if (e.key === 'ArrowLeft') prev();
-		if (e.key === 'ArrowRight') next();
+		else if (e.key === 'ArrowLeft') prev();
+		else if (e.key === 'ArrowRight') next();
+		else if (e.key === 'Tab') {
+			const buttons = [...dialog.value.querySelectorAll('button:not([disabled])')];
+			if (e.shiftKey && document.activeElement === buttons[0]) {
+				e.preventDefault();
+				buttons[buttons.length - 1].focus();
+			} else if (!e.shiftKey && document.activeElement === buttons[buttons.length - 1]) {
+				e.preventDefault();
+				buttons[0].focus();
+			}
+		}
 	}
-
-	onMounted(async () => {
-		await loadOrientations();
-		initSlots();
+	onMounted(() => {
 		window.addEventListener('keydown', onKey);
 		swapTimer = setInterval(swapRandom, 3200);
 	});
@@ -142,7 +81,7 @@
 				<div v-for="(photo, i) in displayed" :key="'slot-' + i" class="group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
 					<button type="button" class="block w-full" @click="show(photo)">
 						<Transition name="fade" mode="out-in">
-							<img :key="photo.src" :src="photo.src" :alt="photo.name" loading="lazy" class="w-full transition duration-500 group-hover:scale-105" />
+							<img :key="photo.src" :src="photo.thumbnail" :alt="description(photo)" loading="lazy" class="w-full transition duration-500 group-hover:scale-105" />
 						</Transition>
 					</button>
 				</div>
@@ -151,8 +90,8 @@
 		</div>
 
 		<Teleport to="body">
-			<div v-if="selectedOpen && selected" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" @click="close">
-				<button type="button" class="absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20" aria-label="Close" @click.stop="close">
+			<div v-if="selectedOpen && selected" ref="dialog" role="dialog" aria-modal="true" aria-label="Photography viewer" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" @click="close">
+				<button ref="closeButton" type="button" class="absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20" aria-label="Close" @click.stop="close">
 					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
@@ -170,8 +109,8 @@
 				</button>
 
 				<figure class="max-h-full max-w-4xl" @click.stop>
-					<img :src="selected.src" :alt="selected.name" class="max-h-[80vh] w-auto rounded-lg object-contain" />
-					<figcaption class="mt-3 text-center text-sm text-slate-300">{{ selected.name }} · {{ index + 1 }} / {{ ordered.length }}</figcaption>
+					<img :src="selected.src" :alt="description(selected)" class="max-h-[80vh] w-auto rounded-lg object-contain" />
+					<figcaption class="mt-3 text-center text-sm text-slate-300">{{ description(selected) }} · {{ index + 1 }} / {{ ordered.length }}</figcaption>
 				</figure>
 			</div>
 		</Teleport>
