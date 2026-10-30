@@ -9,67 +9,40 @@ const socials = [
 ]
 
 const emailHref = `mailto:${profile.email}`
+const year = new Date().getFullYear()
 </script>
 
 <template>
-  <section id="home" class="relative flex min-h-screen items-center pt-16">
-    <div class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-accent-500/10 blur-3xl dark:bg-accent-500/20"></div>
-    <div class="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-amber-500/10 blur-3xl dark:bg-amber-500/20"></div>
-
-    <div class="relative mx-auto max-w-6xl px-4 py-20 sm:px-6">
-      <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-1.5 text-sm text-slate-600 dark:border-slate-800 dark:text-slate-400">
-        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-        Available for opportunities
-      </p>
-
-      <h1 class="text-4xl font-extrabold tracking-tight sm:text-6xl">
-        Hi, I'm
-        <span class="bg-gradient-to-r from-accent-500 to-amber-500 bg-clip-text text-transparent">{{ profile.name }}</span>
-      </h1>
-      <p class="mt-3 text-xl font-semibold text-slate-600 dark:text-slate-300 sm:text-2xl">
-        {{ profile.credentials }} · {{ profile.role }}
-      </p>
-
-      <p class="mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
-        {{ profile.tagline }}
-      </p>
-
-      <div class="mt-8 flex flex-wrap items-center gap-4">
-        <a
-          href="#skills"
-          class="rounded-lg bg-accent-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition hover:bg-accent-500"
-        >
-          My skills
-        </a>
-        <a
-          :href="emailHref"
-          class="rounded-lg border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-accent-500 hover:text-accent-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-accent-500 dark:hover:text-accent-400"
-        >
-          Get in touch
-        </a>
+  <section id="home" class="hero-surface relative overflow-hidden px-4 pb-20 pt-24 sm:px-6 sm:pb-28 sm:pt-28">
+    <div class="relative mx-auto max-w-6xl">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-900/10 pb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:border-white/10 dark:text-slate-400">
+        <span>Portfolio / {{ year }}</span>
+        <span class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Available for opportunities</span>
       </div>
-
-      <div class="mt-10 flex items-center gap-3">
-        <a
-          v-for="s in socials"
-          :key="s.name"
-          :href="s.href"
-          target="_blank"
-          rel="noopener noreferrer"
-          :aria-label="s.name"
-          class="rounded-lg border border-slate-200 p-2.5 text-slate-500 transition hover:border-accent-500 hover:text-accent-600 dark:border-slate-800 dark:text-slate-400 dark:hover:border-accent-500 dark:hover:text-accent-400"
-        >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <path :d="s.icon" />
-          </svg>
-        </a>
+      <div class="grid gap-12 pb-16 pt-10 lg:grid-cols-[1.5fr_0.5fr] lg:items-end lg:gap-16 lg:pb-24 lg:pt-14">
+        <div>
+          <p class="mb-6 text-lg font-semibold tracking-tight text-slate-700 sm:text-2xl dark:text-slate-300">Hello, I'm <span class="text-accent-600 dark:text-accent-300">{{ profile.name }}</span></p>
+          <h1 class="max-w-4xl text-5xl font-semibold leading-[1.02] tracking-[-0.055em] text-slate-950 sm:text-7xl lg:text-8xl dark:text-white">
+            Building thoughtful <span class="hero-accent">digital things.</span>
+          </h1>
+          <p class="mt-8 max-w-xl text-lg leading-relaxed text-slate-600 sm:text-xl dark:text-slate-400">{{ profile.tagline }}</p>
+          <div class="mt-10 flex flex-wrap gap-3">
+            <a href="#skills" class="primary-button">Explore my skills <span aria-hidden="true">↗</span></a>
+            <a :href="emailHref" class="secondary-button">Get in touch <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <div class="hero-note rounded-3xl p-6 sm:p-8">
+          <div class="mb-10 flex items-center justify-between"><span class="section-label">A little about me</span><span class="text-2xl text-accent-600 dark:text-accent-400">✳</span></div>
+          <p class="text-2xl font-medium leading-snug tracking-tight text-slate-900 dark:text-white">Developer by profession.<br>Curious by nature.</p>
+          <div class="mt-8 border-t border-slate-900/10 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">{{ profile.role }}<br>{{ profile.location }}</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-6 border-t border-slate-900/10 pt-6 dark:border-white/10">
+        <a href="#about" class="text-sm font-medium text-slate-600 transition hover:text-accent-600 dark:text-slate-400">Scroll to discover <span aria-hidden="true">↓</span></a>
+        <div class="flex items-center gap-2">
+          <a v-for="s in socials" :key="s.name" :href="s.href" target="_blank" rel="noopener noreferrer" :aria-label="s.name" class="social-button"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path :d="s.icon" /></svg></a>
+        </div>
       </div>
     </div>
-
-    <a href="#about" class="absolute bottom-8 left-1/2 hidden -translate-x-1/2 text-slate-400 hover:text-accent-500 sm:block">
-      <svg class="h-6 w-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-      </svg>
-    </a>
   </section>
 </template>

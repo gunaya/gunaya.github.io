@@ -14,19 +14,19 @@
 </script>
 
 <template>
-	<section id="contact" class="scroll-mt-16 bg-slate-50 py-20 dark:bg-slate-900/40">
+	<section id="contact" class="scroll-mt-16 bg-slate-50 py-24 sm:py-32 dark:bg-slate-900/40">
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
-			<div class="mb-12">
-				<h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Get In Touch</h2>
-				<div class="mt-3 h-1 w-16 rounded-full bg-accent-500"></div>
-				<p class="mt-4 max-w-xl text-slate-600 dark:text-slate-400">Have a project in mind, a teaching opportunity, or just want to say hi? My inbox is always open.</p>
+			<div class="mb-12 border-b border-slate-200 pb-10 dark:border-slate-800">
+				<p class="section-label mb-4">04 / Say hello</p>
+				<h2 class="section-title">Have an idea?<br>Let’s talk<span class="text-accent-500">.</span></h2>
+				<p class="mt-5 max-w-xl leading-relaxed text-slate-600 dark:text-slate-400">Have a project in mind, a teaching opportunity, or just want to say hi? My inbox is always open.</p>
 			</div>
 
 			<div class="grid gap-10 lg:grid-cols-2">
 				<div class="space-y-4">
 					<a
 						:href="`mailto:${profile.email}`"
-						class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
+						class="flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
 						<span class="rounded-xl bg-accent-500/10 p-3 text-accent-600 dark:text-accent-400">
 							<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
 								<path
@@ -45,7 +45,7 @@
 						:href="links.github"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
+						class="flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
 						<span class="rounded-xl bg-accent-500/10 p-3 text-accent-600 dark:text-accent-400">
 							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
 								<path
@@ -62,7 +62,7 @@
 						:href="links.linkedin"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
+						class="flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
 						<span class="rounded-xl bg-accent-500/10 p-3 text-accent-600 dark:text-accent-400">
 							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
 								<path
@@ -76,7 +76,9 @@
 					</a>
 				</div>
 
-				<form class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-950" @submit.prevent="submit">
+				<form class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-8 dark:border-slate-800 dark:bg-slate-950" @submit.prevent="submit">
+					<h3 class="mb-1 text-xl font-semibold tracking-tight">Start a conversation</h3>
+					<p class="mb-6 text-sm text-slate-500 dark:text-slate-400">This form opens a draft in your email app.</p>
 					<div class="space-y-4">
 						<div>
 							<label for="name" class="mb-1.5 block text-sm font-medium">Name</label>
@@ -108,7 +110,7 @@
 								placeholder="Your message..."
 								class="w-full resize-none rounded-lg border border-slate-300 bg-transparent px-4 py-2.5 text-sm outline-none transition focus:border-accent-500 dark:border-slate-700"></textarea>
 						</div>
-						<button type="submit" class="w-full rounded-lg bg-accent-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition hover:bg-accent-500">
+						<button type="submit" class="w-full rounded-full bg-accent-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/25 transition hover:bg-accent-500">
 							Send message
 						</button>
 						<p v-if="sent" class="text-center text-sm text-emerald-600 dark:text-emerald-400">Opening your email client…</p>

@@ -32,17 +32,18 @@
 <template>
 	<header
 		class="fixed inset-x-0 top-0 z-50 border-b transition-colors"
-		:class="scrolled ? 'border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80' : 'border-transparent bg-transparent'">
+		:class="scrolled ? 'border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80' : 'border-slate-200/60 bg-white/80 backdrop-blur dark:border-slate-800/60 dark:bg-slate-950/80'">
 		<nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-			<a href="#home" class="text-lg font-bold tracking-tight"> <span class="text-accent-600 dark:text-accent-400">gunaya</span>.dev </a>
+			<a href="#home" class="text-lg font-bold tracking-tight"> <span class="text-slate-950 dark:text-white">gunaya</span><span class="text-accent-600 dark:text-accent-400">.</span> </a>
 
 			<div class="hidden items-center gap-1 md:flex">
 				<a
 					v-for="s in sections"
 					:key="s.id"
 					:href="`#${s.id}`"
-					class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-					:class="active === s.id ? 'text-accent-600 dark:text-accent-400' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'">
+					class="rounded-full px-3 py-2 text-sm font-medium transition-colors"
+					:aria-current="active === s.id ? 'location' : undefined"
+					:class="active === s.id ? 'bg-accent-50 text-accent-700 dark:bg-accent-500/15 dark:text-accent-300' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'">
 					{{ s.label }}
 				</a>
 
