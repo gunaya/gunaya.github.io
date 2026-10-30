@@ -16,14 +16,14 @@
 <template>
 	<section id="contact" class="scroll-mt-16 bg-slate-50 py-24 sm:py-32 dark:bg-slate-900/40">
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
-			<div class="mb-12 border-b border-slate-200 pb-10 dark:border-slate-800">
+			<div v-reveal="{ from: 'left' }" class="mb-12 border-b border-slate-200 pb-10 dark:border-slate-800">
 				<p class="section-label mb-4">04 / Say hello</p>
 				<h2 class="section-title">Have an idea?<br>Let’s talk<span class="text-accent-500">.</span></h2>
 				<p class="mt-5 max-w-xl leading-relaxed text-slate-600 dark:text-slate-400">Have a project in mind, a teaching opportunity, or just want to say hi? My inbox is always open.</p>
 			</div>
 
 			<div class="grid gap-10 lg:grid-cols-2">
-				<div class="space-y-4">
+				<div v-reveal="{ from: 'left' }" class="space-y-4">
 					<a
 						:href="`mailto:${profile.email}`"
 						class="flex items-center gap-4 rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-accent-400 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-accent-500">
@@ -76,7 +76,7 @@
 					</a>
 				</div>
 
-				<form class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-8 dark:border-slate-800 dark:bg-slate-950" @submit.prevent="submit">
+				<form v-reveal="{ from: 'right', delay: 1 }" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-8 dark:border-slate-800 dark:bg-slate-950" @submit.prevent="submit">
 					<h3 class="mb-1 text-xl font-semibold tracking-tight">Start a conversation</h3>
 					<p class="mb-6 text-sm text-slate-500 dark:text-slate-400">This form opens a draft in your email app.</p>
 					<div class="space-y-4">

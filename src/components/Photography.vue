@@ -60,7 +60,9 @@
 	}
 	onMounted(() => {
 		window.addEventListener('keydown', onKey);
-		swapTimer = setInterval(swapRandom, 3200);
+		if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			swapTimer = setInterval(swapRandom, 3200);
+		}
 	});
 	onBeforeUnmount(() => {
 		window.removeEventListener('keydown', onKey);
@@ -72,15 +74,15 @@
 	<section id="photography" class="scroll-mt-16 py-24 sm:py-32">
 		<div class="mx-auto max-w-6xl px-4 sm:px-6">
 			<div class="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-				<div>
+				<div v-reveal="{ from: 'left' }">
 					<p class="section-label mb-4">03 / Beyond the screen</p>
 					<h2 class="section-title">A different<br>point of view<span class="text-accent-500">.</span></h2>
 				</div>
-				<p class="max-w-sm leading-relaxed text-slate-600 dark:text-slate-400">A collection of moments seen through my lens. Select a photo to take a closer look.</p>
+				<p v-reveal="{ from: 'right' }" class="max-w-sm leading-relaxed text-slate-600 dark:text-slate-400">A collection of moments seen through my lens. Select a photo to take a closer look.</p>
 			</div>
 
 			<div v-if="displayed.length" class="columns-1 gap-4 sm:columns-2 lg:columns-3">
-				<div v-for="(photo, i) in displayed" :key="'slot-' + i" class="photo-tile group relative mb-4 break-inside-avoid overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800">
+				<div v-for="(photo, i) in displayed" :key="'slot-' + i" v-reveal="{ from: 'zoom', delay: i % 3 }" class="photo-tile group relative mb-4 break-inside-avoid overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800">
 					<button type="button" class="block w-full" @click="show(photo)">
 						<Transition name="fade" mode="out-in">
 							<img :key="photo.src" :src="photo.thumbnail" :alt="description(photo)" loading="lazy" class="w-full transition duration-500 group-hover:scale-105" />

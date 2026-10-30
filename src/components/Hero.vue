@@ -14,13 +14,14 @@ const year = new Date().getFullYear()
 
 <template>
   <section id="home" class="hero-surface relative overflow-hidden px-4 pb-20 pt-24 sm:px-6 sm:pb-28 sm:pt-28">
+    <div class="hero-orb" aria-hidden="true"></div>
     <div class="relative mx-auto max-w-6xl">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-900/10 pb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:border-white/10 dark:text-slate-400">
         <span>Portfolio / {{ year }}</span>
         <span class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Available for opportunities</span>
       </div>
-      <div class="grid gap-12 pb-16 pt-10 lg:grid-cols-[1.5fr_0.5fr] lg:items-end lg:gap-16 lg:pb-24 lg:pt-14">
-        <div>
+      <div class="hero-scroll-content grid gap-12 pb-16 pt-10 lg:grid-cols-[1.5fr_0.5fr] lg:items-end lg:gap-16 lg:pb-24 lg:pt-14">
+        <div v-reveal="{ from: 'left' }">
           <p class="mb-6 text-lg font-semibold tracking-tight text-slate-700 sm:text-2xl dark:text-slate-300">Hello, I'm <span class="text-accent-600 dark:text-accent-300">{{ profile.name }}</span></p>
           <h1 class="max-w-4xl text-5xl font-semibold leading-[1.02] tracking-[-0.055em] text-slate-950 sm:text-7xl lg:text-8xl dark:text-white">
             Building thoughtful <span class="hero-accent">digital things.</span>
@@ -31,7 +32,7 @@ const year = new Date().getFullYear()
             <a :href="emailHref" class="secondary-button">Get in touch <span aria-hidden="true">↗</span></a>
           </div>
         </div>
-        <div class="hero-note rounded-3xl p-6 sm:p-8">
+        <div v-reveal="{ from: 'right', delay: 1 }" class="hero-note rounded-3xl p-6 sm:p-8">
           <div class="mb-10 flex items-center justify-between"><span class="section-label">A little about me</span><span class="text-2xl text-accent-600 dark:text-accent-400">✳</span></div>
           <p class="text-2xl font-medium leading-snug tracking-tight text-slate-900 dark:text-white">Developer by profession.<br>Curious by nature.</p>
           <div class="mt-8 border-t border-slate-900/10 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">{{ profile.role }}<br>{{ profile.location }}</div>

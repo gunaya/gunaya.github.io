@@ -1,5 +1,6 @@
 <script setup>
-	import { ref, onMounted } from 'vue';
+	import { ref, onMounted, onBeforeUnmount } from 'vue';
+	import { setupSmoothScroll } from './utils/smooth-scroll.js';
 	import Navbar from './components/Navbar.vue';
 	import Hero from './components/Hero.vue';
 	import About from './components/About.vue';
@@ -9,6 +10,7 @@
 	import Footer from './components/Footer.vue';
 
 	const isDark = ref(false);
+	let cleanupSmoothScroll;
 
 	function toggleTheme() {
 		isDark.value = !isDark.value;
@@ -17,11 +19,13 @@
 	}
 
 	onMounted(() => {
+		cleanupSmoothScroll = setupSmoothScroll();
 		const saved = localStorage.getItem('theme');
 		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 		isDark.value = saved ? saved === 'dark' : prefersDark;
 		document.documentElement.classList.toggle('dark', isDark.value);
 	});
+	onBeforeUnmount(() => cleanupSmoothScroll?.());
 </script>
 
 <template>
