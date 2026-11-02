@@ -22,7 +22,7 @@ for (const [index, name] of files.entries()) {
   const info = await sharp(input).rotate().resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toFile(path.join(outputDir, fullName))
   await sharp(input).rotate().resize({ width: 640, height: 640, fit: 'inside', withoutEnlargement: true }).webp({ quality: 75 }).toFile(path.join(outputDir, thumbName))
   imports.push(`import full${index} from './${fullName}'`, `import thumb${index} from './${thumbName}'`)
-  entries.push(`  { src: full${index}, thumbnail: thumb${index}, filename: ${JSON.stringify(name)}, orient: ${JSON.stringify(info.width > info.height ? 'landscape' : 'portrait')} }`)
+  entries.push(`  { src: full${index}, thumbnail: thumb${index}, filename: ${JSON.stringify(name)}, orient: ${JSON.stringify(info.width > info.height ? 'landscape' : 'portrait')}, width: ${info.width}, height: ${info.height} }`)
 }
 await writeFile(path.join(outputDir, 'index.js'), `${imports.join('\n')}\n\nexport default [\n${entries.join(',\n')}\n]\n`)
 console.log(`Generated ${files.length} optimized photos and thumbnails without changing originals.`)

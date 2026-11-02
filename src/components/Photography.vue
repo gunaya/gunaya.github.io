@@ -1,52 +1,39 @@
 <script setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
-import photos from '../generated/photos/index.js';
-import { createSlots, shuffle } from '../utils/gallery.js';
+import { ref, nextTick, onMounted, onBeforeUnmount, computed } from 'vue';
+import { sheetPhotos } from '../utils/photos.js';
 import { photoDescriptions } from '../data/photo-descriptions.js';
 
-const ordered = shuffle(photos);
-const displayed = ref(createSlots(photos));
 const selected = ref(null);
-const selectedOpen = ref(false);
-const dialog = ref(null);
+const paused = ref(false);
 const closeButton = ref(null);
+const dialog = ref(null);
 let previousFocus = null;
-let swapTimer = null;
+
+const index = computed(() => (selected.value ? sheetPhotos.findIndex((photo) => photo.src === selected.value.src) : 0));
 
 function description(photo) {
 	return photoDescriptions[photo.filename] || 'Photograph from I Wayan Gunaya’s portfolio';
 }
 
-function swapRandom() {
-	const used = new Set(displayed.value.map((photo) => photo.src));
-	const remaining = photos.filter((photo) => !used.has(photo.src));
-	if (!remaining.length || !displayed.value.length) return;
-	const slot = Math.floor(Math.random() * displayed.value.length);
-	const matching = remaining.filter((photo) => photo.orient === displayed.value[slot].orient);
-	const candidates = matching.length ? matching : remaining;
-	const next = candidates[Math.floor(Math.random() * candidates.length)];
-	displayed.value = displayed.value.map((photo, i) => i === slot ? next : photo);
-}
-
-async function show(photo) {
+async function open(photo) {
 	previousFocus = document.activeElement;
 	selected.value = photo;
-	selectedOpen.value = true;
 	await nextTick();
 	closeButton.value?.focus();
 }
 function close() {
-	selectedOpen.value = false;
+	selected.value = null;
 	previousFocus?.focus();
 }
-const index = computed(() => selected.value ? ordered.indexOf(selected.value) : 0);
-function prev() { selected.value = ordered[(index.value - 1 + ordered.length) % ordered.length]; }
-function next() { selected.value = ordered[(index.value + 1) % ordered.length]; }
+function step(delta) {
+	const total = sheetPhotos.length;
+	selected.value = sheetPhotos[(index.value + delta + total) % total];
+}
 function onKey(e) {
-	if (!selectedOpen.value) return;
+	if (!selected.value) return;
 	if (e.key === 'Escape') close();
-	else if (e.key === 'ArrowLeft') prev();
-	else if (e.key === 'ArrowRight') next();
+	else if (e.key === 'ArrowLeft') step(-1);
+	else if (e.key === 'ArrowRight') step(1);
 	else if (e.key === 'Tab') {
 		const buttons = [...dialog.value.querySelectorAll('button:not([disabled])')];
 		if (e.shiftKey && document.activeElement === buttons[0]) {
@@ -58,71 +45,69 @@ function onKey(e) {
 		}
 	}
 }
-onMounted(() => {
-	window.addEventListener('keydown', onKey);
-	if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-		swapTimer = setInterval(swapRandom, 3200);
-	}
-});
-onBeforeUnmount(() => {
-	window.removeEventListener('keydown', onKey);
-	clearInterval(swapTimer);
-});
+onMounted(() => window.addEventListener('keydown', onKey));
+onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 </script>
 
 <template>
-	<section id="photography" class="scroll-mt-16 bg-field py-28 text-on-field sm:py-40">
-		<div class="frame">
-			<h2 class="h-section max-w-[12ch]">A different point of view.</h2>
-			<p class="mt-8 max-w-[44ch] text-lg leading-relaxed">A collection of moments seen through my lens. Select a photo to take a closer look.</p>
+	<section id="photography" class="section scroll-mt-16 frame">
+		<div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+			<h2 class="h-section" data-reveal>Photography</h2>
+			<p class="text-body max-w-[46ch] lg:text-right" data-reveal style="--d: 120ms">
+				{{ sheetPhotos.length }} photographs from my travels around Bali. Select any frame to view it larger.
+			</p>
+		</div>
 
-			<div v-if="displayed.length" class="mt-16 columns-1 gap-4 sm:columns-2 lg:columns-3">
-				<div v-for="(photo, i) in displayed" :key="'slot-' + i" class="photo-tile group relative mb-4 break-inside-avoid overflow-hidden">
-					<button type="button" class="block w-full" @click="show(photo)">
-						<Transition name="fade" mode="out-in">
-							<img :key="photo.src" :src="photo.thumbnail" :alt="description(photo)" loading="lazy" class="w-full transition duration-500 group-hover:scale-105" />
-						</Transition>
-					</button>
-				</div>
+		<div class="reel mt-16" data-reveal>
+			<div class="reel-track" :class="{ 'is-paused': paused }">
+				<ul class="flex gap-3 pr-3">
+					<li v-for="photo in sheetPhotos" :key="photo.src" class="h-56 shrink-0 sm:h-72">
+						<button type="button" class="block h-full overflow-hidden" :aria-label="`View: ${description(photo)}`" @click="open(photo)">
+							<img :src="photo.thumbnail" :alt="description(photo)" :width="photo.width" :height="photo.height" loading="lazy" class="h-full w-auto transition duration-500 hover:scale-[1.02]" />
+						</button>
+					</li>
+				</ul>
+				<ul class="reel-copy flex gap-3 pr-3" aria-hidden="true" inert>
+					<li v-for="photo in sheetPhotos" :key="`copy-${photo.src}`" class="h-56 shrink-0 sm:h-72">
+						<img :src="photo.thumbnail" alt="" :width="photo.width" :height="photo.height" loading="lazy" class="h-full w-auto" />
+					</li>
+				</ul>
 			</div>
-			<p v-else class="mt-16">No photos yet — drop some images into <code>src/assets/img</code>.</p>
+		</div>
+		<div class="mt-6 flex justify-end motion-reduce:hidden">
+			<button type="button" class="text-small underline underline-offset-4" @click="paused = !paused">{{ paused ? 'Play slideshow' : 'Pause slideshow' }}</button>
 		</div>
 
 		<Teleport to="body">
-			<div v-if="selectedOpen && selected" ref="dialog" role="dialog" aria-modal="true" aria-label="Photography viewer" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" @click="close">
-				<button ref="closeButton" type="button" class="absolute top-4 right-4 bg-white/10 p-2 text-white transition hover:bg-white/20" aria-label="Close" @click.stop="close">
-					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+			<div
+				v-if="selected"
+				ref="dialog"
+				role="dialog"
+				aria-modal="true"
+				aria-label="Photography viewer"
+				class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+				@click="close">
+				<button ref="closeButton" type="button" class="absolute right-4 top-4 bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Close" @click.stop="close">
+					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
 					</svg>
 				</button>
-
-				<button v-if="ordered.length > 1" type="button" class="absolute left-4 bg-white/10 p-2 text-white transition hover:bg-white/20" aria-label="Previous" @click.stop="prev">
-					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+				<button type="button" class="absolute left-4 bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Previous photograph" @click.stop="step(-1)">
+					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 					</svg>
 				</button>
-				<button v-if="ordered.length > 1" type="button" class="absolute right-4 bg-white/10 p-2 text-white transition hover:bg-white/20" aria-label="Next" @click.stop="next">
-					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+				<button type="button" class="absolute right-4 bg-white/20 p-3 text-white transition hover:bg-white/30" aria-label="Next photograph" @click.stop="step(1)">
+					<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
 					</svg>
 				</button>
 
-				<figure class="max-h-full max-w-4xl" @click.stop>
-					<img :src="selected.src" :alt="description(selected)" class="max-h-[80vh] w-auto object-contain" />
-					<figcaption class="mt-3 text-center text-sm text-slate-300">{{ description(selected) }} · {{ index + 1 }} / {{ ordered.length }}</figcaption>
+				<figure class="max-h-full max-w-5xl" @click.stop>
+					<img :src="selected.src" :alt="description(selected)" class="max-h-[80svh] w-auto object-contain" />
+					<figcaption class="mt-3 text-center text-small text-white/80">{{ description(selected) }} · {{ index + 1 }} / {{ sheetPhotos.length }}</figcaption>
 				</figure>
 			</div>
 		</Teleport>
 	</section>
 </template>
-
-<style scoped>
-	.fade-enter-active,
-	.fade-leave-active {
-		transition: opacity 0.7s ease;
-	}
-	.fade-enter-from,
-	.fade-leave-to {
-		opacity: 0;
-	}
-</style>

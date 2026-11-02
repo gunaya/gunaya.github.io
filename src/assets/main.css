@@ -1,86 +1,205 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Gambarino";
+  src: url("./fonts/gambarino-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("./fonts/general-sans-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("./fonts/general-sans-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "General Sans", system-ui, sans-serif;
+  --font-display: "Gambarino", Georgia, serif;
   --color-ground: var(--ground);
-  --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
-  --color-field: var(--field);
-  --color-on-field: var(--on-field);
+  --color-sheet: var(--sheet);
+  --color-on-sheet: var(--on-sheet);
 }
 
 :root {
-  --ground: #f3efe4;
-  --surface: #e6dfcf;
-  --ink: #1f1f1a;
-  --muted: #66635a;
-  --accent: #4f6238;
+  color-scheme: light;
+  --ground: #dfdedb;
+  --ink: #26251e;
+  --muted: #4f4d46;
+  --accent: #2456d6;
   --on-accent: #ffffff;
-  --field: #34462a;
-  --on-field: #f3efe4;
+  --sheet: #f6f6f4;
+  --on-sheet: #26251e;
+  --step-small: clamp(0.9375rem, 0.91rem + 0.15vw, 1.0625rem);
+  --step-body: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2.5rem, 1.6rem + 4vw, 5rem);
+  --step-display: clamp(3rem, 8vw, 7.5rem);
+  --step-statement: clamp(1.5rem, 2.6vw, 2.25rem);
+  --step-item: clamp(1.5rem, 2.4vw, 2.1rem);
+  --step-stat: clamp(2.5rem, 4.5vw, 4rem);
+  --frame: clamp(1rem, 1.6vw, 1.5rem);
+  --hero-room: #2b2a26;
 }
 
-html.dark {
-  --ground: #121410;
-  --surface: #1b1f17;
-  --ink: #ebe7da;
-  --muted: #a3a193;
-  --accent: #b5cb93;
-  --on-accent: #131710;
-  --field: #223019;
-  --on-field: #ebe7da;
-}
-
-:root { --frame: clamp(1.5rem, 4vw, 4rem); }
 .frame { padding-left: var(--frame); padding-right: var(--frame); }
+.section { padding-block: clamp(5rem, 9vw, 8rem); }
 
 html { scroll-behavior: smooth; }
 html.wheel-scrolling { scroll-behavior: auto; }
-body { font-family: var(--font-sans); background: var(--ground); color: var(--ink); -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  background: var(--ground);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
 ::selection { background: var(--accent); color: var(--on-accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-.bg-field :focus-visible { outline-color: var(--on-field); }
 
-.display {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: .95;
-  letter-spacing: -.035em;
-}
+.font-display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.02em; line-height: 0.95; }
 .h-section {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.5rem, 5vw, 4.75rem);
-  line-height: 1.02;
-  letter-spacing: -.035em;
+  font-weight: 400;
+  font-size: var(--step-head);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
 }
-.h-group {
+.statement {
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(1.5rem, 2.2vw, 2rem);
-  line-height: 1.1;
-  letter-spacing: -.02em;
+  font-weight: 400;
+  font-size: var(--step-statement);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
+.text-lead { font-size: var(--step-lead); line-height: 1.4; }
+.text-small { font-size: var(--step-small); line-height: 1.45; }
+.text-body { font-size: var(--step-body); line-height: 1.55; }
+.text-display { font-size: var(--step-display); }
+.text-stat { font-size: var(--step-stat); }
+.text-item { font-size: var(--step-item); line-height: 1.1; }
+
 .button {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
-  padding: .9rem 1.6rem;
-  border-radius: 999px;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 1rem;
-  font-weight: 600;
-  transition: transform .2s, opacity .2s;
+  font-size: var(--step-body);
+  font-weight: 500;
+  border-radius: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
-.button:hover { transform: translateY(-2px); opacity: .92; }
+.button:hover { transform: translateY(-2px); opacity: 0.92; }
+.button:active { transform: translateY(0) scale(0.98); }
 
+.field-input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.9rem;
+  background: transparent;
+  color: var(--on-sheet);
+  font-size: var(--step-body);
+  border: 0;
+  border-bottom: 2px dotted var(--ink);
+  border-radius: 0;
+  outline: none;
+}
+.field-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.field-input::placeholder { color: var(--muted); }
+
+/* The page is one stack of paper objects. Each sheet is filled with real edges. */
+.sheet-card {
+  background: var(--sheet);
+  color: var(--on-sheet);
+  padding: clamp(2rem, 4vw, 3.5rem);
+}
+.sheet-scallop {
+  clip-path: polygon(
+    0 0, 100% 0, 100% calc(100% - 14px),
+    96% 100%, 92% calc(100% - 14px), 88% 100%, 84% calc(100% - 14px), 80% 100%,
+    76% calc(100% - 14px), 72% 100%, 68% calc(100% - 14px), 64% 100%,
+    60% calc(100% - 14px), 56% 100%, 52% calc(100% - 14px), 48% 100%,
+    44% calc(100% - 14px), 40% 100%, 36% calc(100% - 14px), 32% 100%,
+    28% calc(100% - 14px), 24% 100%, 20% calc(100% - 14px), 16% 100%,
+    12% calc(100% - 14px), 8% 100%, 4% calc(100% - 14px), 0 100%
+  );
+}
+.stub {
+  background: var(--sheet);
+  color: var(--on-sheet);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+.perf {
+  height: 0;
+  border-top: 4px dotted var(--ground);
+}
+
+/* One-time load fade for content blocks. Nothing is tied to scroll position. */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 1s ease var(--d, 0ms), transform 1s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms);
+}
+.js.ready [data-reveal] { opacity: 1; transform: none; }
+
+/* Photography reel: the track holds two identical sets, so moving it by half its width loops without a jump. */
+.reel { overflow: hidden; }
+.reel-track {
+  display: flex;
+  width: max-content;
+  animation: reel 90s linear infinite;
+}
+.reel:hover .reel-track,
+.reel:focus-within .reel-track,
+.reel-track.is-paused { animation-play-state: paused; }
+@keyframes reel {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Hero photo: a calendar page. Drag it down, or press the down arrow, to tear the top strip away and reveal the next month. The torn page may extend past the photo's box. */
+.tear-stage { cursor: grab; overflow: visible; z-index: 1; }
+.tear-stage.is-dragging { cursor: grabbing; }
+.tear-sheet { position: absolute; inset: 0; pointer-events: none; }
+.tear-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tear-under { overflow: hidden; }
+.tear-stage.is-dragging .tear-under .tear-photo,
+.tear-stage.is-flying .tear-under .tear-photo { transform: scale(1.05); }
+.tear-flap { transform-origin: 50% 0; transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tear-stage.is-dragging .tear-flap,
+.tear-stage.is-snapping .tear-flap { transition: none; }
+.tear-stage.is-flying .tear-flap { transition: transform 0.7s cubic-bezier(0.5, 0, 0.8, 0.4); }
+
+/* Hero: a card placed on a dim room. The card drops in once on load. */
+.hero-room { background-color: var(--hero-room); }
+.hero-card {
+  transform-origin: 50% 0;
+}
+.js:not(.ready) .hero-card { opacity: 0; transform: translateY(-24px) rotate(-1.2deg); }
+.js.ready .hero-card { transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .js.ready .hero-card, .js:not(.ready) .hero-card { opacity: 1; transform: none; transition: none; }
+  .reel-track { animation: none; }
+  .reel-copy { display: none; }
+  .reel { overflow-x: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

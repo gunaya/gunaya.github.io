@@ -6,3 +6,4 @@ src/generated/
 *.local
 .env
 .env.*
+.taste-skill
