@@ -1,18 +1,19 @@
 <script setup>
-import { profile } from '../data/portfolio.js'
-
-const year = new Date().getFullYear()
+import { profile, links } from '../data/portfolio.js'
 </script>
 
 <template>
-  <footer class="border-t border-slate-200 bg-white py-10 dark:border-slate-800 dark:bg-slate-950">
-    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
-      <p class="text-sm text-slate-500 dark:text-slate-400">
-        © {{ year }} {{ profile.name }}. All rights reserved.
-      </p>
-      <a href="#home" class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-accent-400 hover:text-accent-600 dark:border-slate-700 dark:text-slate-400 dark:hover:text-accent-400">
-        Back to top ↑
-      </a>
+  <div class="bg-field text-on-field">
+  <footer class="frame py-12 sm:py-14">
+    <p class="display text-[clamp(2.5rem,6vw,5.5rem)] text-on-field">I Wayan Gunaya</p>
+    <div class="mt-10 flex flex-col gap-4 text-base sm:flex-row sm:items-center sm:justify-between">
+      <p>© {{ new Date().getFullYear() }} {{ profile.name }}. All rights reserved.</p>
+      <div class="flex flex-wrap gap-x-6 gap-y-2">
+        <a :href="links.github" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">GitHub</a>
+        <a :href="links.linkedin" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">LinkedIn</a>
+        <a href="#home" class="underline underline-offset-4">Back to top ↑</a>
+      </div>
     </div>
   </footer>
+  </div>
 </template>

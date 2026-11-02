@@ -1,73 +1,53 @@
 <script setup>
-	import { ref, onMounted, onBeforeUnmount } from 'vue';
-	import { sections } from '../data/portfolio.js';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { sections } from '../data/portfolio.js';
 
-	defineProps({
-		isDark: Boolean
-	});
-	defineEmits(['toggle-theme']);
+defineProps({
+	isDark: Boolean
+});
+defineEmits(['toggle-theme']);
 
-	const active = ref('home');
-	const scrolled = ref(false);
-	const menuOpen = ref(false);
+const active = ref('home');
+const menuOpen = ref(false);
 
-	function onScroll() {
-		scrolled.value = window.scrollY > 20;
-		const pos = window.scrollY + 120;
-		let current = 'home';
-		for (const s of sections) {
-			const el = document.getElementById(s.id);
-			if (el && el.offsetTop <= pos) current = s.id;
-		}
-		active.value = current;
+function onScroll() {
+	const pos = window.scrollY + 120;
+	let current = 'home';
+	for (const s of sections) {
+		const el = document.getElementById(s.id);
+		if (el && el.offsetTop <= pos) current = s.id;
 	}
+	active.value = current;
+}
 
-	onMounted(() => {
-		window.addEventListener('scroll', onScroll, { passive: true });
-		onScroll();
-	});
-	onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
+onMounted(() => {
+	window.addEventListener('scroll', onScroll, { passive: true });
+	onScroll();
+});
+onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 </script>
 
 <template>
-	<header
-		class="fixed inset-x-0 top-0 z-50 border-b transition-colors"
-		:class="scrolled ? 'border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80' : 'border-slate-200/60 bg-white/80 backdrop-blur dark:border-slate-800/60 dark:bg-slate-950/80'">
-		<nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-			<a href="#home" class="text-lg font-bold tracking-tight"> <span class="text-slate-950 dark:text-white">gunaya</span><span class="text-accent-600 dark:text-accent-400">.</span> </a>
+	<header class="fixed inset-x-0 top-0 z-50 bg-ground">
+		<nav class="frame flex h-16 items-center justify-between gap-6">
+			<a href="#home" class="font-display text-xl font-bold tracking-tight text-ink">I Wayan Gunaya</a>
 
-			<div class="hidden items-center gap-1 md:flex">
+			<div class="hidden items-center gap-6 xl:flex">
 				<a
-					v-for="s in sections"
+					v-for="s in sections.filter((s) => s.id !== 'home')"
 					:key="s.id"
 					:href="`#${s.id}`"
-					class="rounded-full px-3 py-2 text-sm font-medium transition-colors"
+					class="text-base transition-colors"
 					:aria-current="active === s.id ? 'location' : undefined"
-					:class="active === s.id ? 'bg-accent-50 text-accent-700 dark:bg-accent-500/15 dark:text-accent-300' : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'">
+					:class="active === s.id ? 'font-semibold text-accent' : 'text-muted hover:text-ink'">
 					{{ s.label }}
 				</a>
-
-				<button
-					type="button"
-					aria-label="Toggle theme"
-					class="ml-3 rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-					@click="$emit('toggle-theme')">
-					<svg v-if="isDark" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M12 3v1.5m0 15V21m9-9h-1.5M4.5 12H3m15.364 6.364l-1.061-1.061M6.696 6.696l-1.06-1.06m12.728 0l-1.061 1.06M6.696 17.304l-1.06 1.06M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-					</svg>
-					<svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-					</svg>
+				<button type="button" class="text-base text-muted transition-colors hover:text-ink" @click="$emit('toggle-theme')">
+					{{ isDark ? 'Light mode' : 'Dark mode' }}
 				</button>
 			</div>
 
-			<button type="button" aria-label="Toggle menu" :aria-expanded="menuOpen" aria-controls="mobile-menu" class="rounded-lg p-2 text-slate-600 dark:text-slate-400 md:hidden" @click="menuOpen = !menuOpen">
+			<button type="button" aria-label="Toggle menu" :aria-expanded="menuOpen" aria-controls="mobile-menu" class="p-2 text-ink xl:hidden" @click="menuOpen = !menuOpen">
 				<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
 					<path v-if="!menuOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
 					<path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -75,16 +55,16 @@
 			</button>
 		</nav>
 
-		<div v-if="menuOpen" id="mobile-menu" class="border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950 md:hidden">
+		<div v-if="menuOpen" id="mobile-menu" class="bg-ground px-6 pb-6 xl:hidden">
 			<a
-				v-for="s in sections"
+				v-for="s in sections.filter((s) => s.id !== 'home')"
 				:key="s.id"
 				:href="`#${s.id}`"
-				class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+				class="block py-3 text-xl text-ink"
 				@click="menuOpen = false">
 				{{ s.label }}
 			</a>
-			<button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800" @click="$emit('toggle-theme')">
+			<button type="button" class="mt-2 block py-3 text-left text-base text-muted" @click="$emit('toggle-theme')">
 				Switch to {{ isDark ? 'light' : 'dark' }} theme
 			</button>
 		</div>

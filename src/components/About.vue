@@ -3,32 +3,22 @@ import { about, profile } from '../data/portfolio.js'
 </script>
 
 <template>
-  <section id="about" class="scroll-mt-16 py-24 sm:py-32">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
-      <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
-        <div v-reveal="{ from: 'left' }">
-          <p class="section-label mb-4">01 / The person behind the work</p>
-          <h2 class="section-title">A little more<br>about me<span class="text-accent-500">.</span></h2>
-          <div class="mt-8 inline-flex items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">
-            <span class="h-2 w-2 rounded-full bg-accent-500"></span> Based in {{ profile.location }}
-          </div>
-        </div>
-        <div v-reveal="{ from: 'right', delay: 1 }">
-          <p class="text-xl leading-relaxed tracking-tight text-slate-700 sm:text-2xl dark:text-slate-300">{{ about.intro }}</p>
-          <div class="mt-9 border-t border-slate-200 pt-6 dark:border-slate-800">
-            <h3 class="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Things I'm curious about</h3>
-            <div class="flex flex-wrap gap-2">
-              <span v-for="interest in about.interests" :key="interest" class="rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">{{ interest }}</span>
-            </div>
-          </div>
-          <div class="mt-10 grid grid-cols-2 gap-3 sm:gap-4">
-            <div v-for="highlight in about.highlights" :key="highlight.label" class="about-stat rounded-3xl p-5 sm:p-7">
-              <span class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl dark:text-white">{{ highlight.value }}</span>
-              <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">{{ highlight.label }}</p>
-            </div>
-          </div>
+  <section id="about" class="frame scroll-mt-16 py-28 sm:py-40">
+    <div>
+      <h2 class="h-section text-ink">About me.</h2>
+      <p class="mt-10 max-w-[38ch] text-xl leading-relaxed text-ink sm:text-2xl">{{ about.intro }}</p>
+      <p class="mt-6 text-base text-muted">Based in {{ profile.location }}</p>
+    </div>
+
+    <div class="mt-16 flex flex-col gap-12">
+        <div v-for="highlight in about.highlights" :key="highlight.label">
+          <p class="font-display text-[clamp(4rem,7vw,6.5rem)] font-bold leading-none tracking-[-0.04em] whitespace-nowrap text-accent">{{ highlight.value }}</p>
+          <p class="mt-3 text-lg text-ink">{{ highlight.label }}</p>
         </div>
       </div>
-    </div>
+
+    <ul class="mt-16 flex flex-wrap gap-x-8 gap-y-3 text-lg text-ink">
+      <li v-for="interest in about.interests" :key="interest">{{ interest }}</li>
+    </ul>
   </section>
 </template>
